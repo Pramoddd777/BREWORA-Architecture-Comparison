@@ -1,0 +1,29 @@
+# Experiment 4: Microservices Fault Isolation
+
+## Objective
+To evaluate whether the microservices order workflow continues when the notification service becomes unavailable.
+
+## Experiment Procedure
+1. Start all microservices and the API Gateway.
+2. Stop the notification service.
+3. Verify that the API Gateway remains operational.
+4. Submit an order through the API Gateway.
+5. Observe payment, kitchen, notification and order statuses.
+6. Restart the notification service.
+7. Verify service recovery.
+
+## Observed Results
+
+- Notification service became unavailable.
+- API Gateway remained operational.
+- Payment was successful.
+- Kitchen accepted the order.
+- Notification status was unavailable.
+- Order returned HTTP 201.
+- Order status was confirmed.
+- After restarting notification, all 13 services recovered.
+
+## Conclusion
+The experiment demonstrates fault isolation for the notification service. Since notification is a best-effort operation, its failure does not prevent successful order confirmation.
+
+This result applies to the tested implementation and scenario; it does not establish that every microservice failure can be isolated.

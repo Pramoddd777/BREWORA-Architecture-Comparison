@@ -1,0 +1,15 @@
+const express=require("express");
+const {instrument}=require("../shared/metrics");
+const name=process.env.SERVICE_NAME||"product", port=Number(process.env.PORT||5002);
+const app=express();app.use(express.json());instrument(app,"microservices",name);
+let stock=100;
+app.get("/health",(_q,r)=>r.json({status:"ok",service:name,port}));
+app.get("/internal/product/:id",(q,r)=>r.json({id:q.params.id,name:"Brewora House Coffee",price:250,service:name}));
+app.get("/internal/catalog/search",(q,r)=>{const p={id:"coffee-1",name:"Brewora House Coffee",price:250};r.json({items:p.name.toLowerCase().includes(String(q.query.q||"").toLowerCase())?[p]:[]});});
+app.get("/internal/inventory",(q,r)=>r.json({stock}));
+app.post("/internal/inventory/reserve",(q,r)=>{const n=Math.max(1,Number(q.body.quantity)||1);if(stock<n)return r.status(409).json({error:"Insufficient inventory"});stock-=n;r.json({reserved:true,stock});});
+app.post("/internal/inventory/adjust",(q,r)=>{stock+=Number(q.body.amount)||0;r.json({stock});});
+app.post("/internal/payment/charge",(_q,r)=>r.json({status:"paid",transactionId:"pay-"+Date.now()}));
+app.post("/internal/kitchen/accept",(_q,r)=>r.json({status:"accepted"}));
+app.post("/internal/notification/send",(_q,r)=>r.json({status:"queued"}));
+app.listen(port,()=>console.log(`${name} service: http://localhost:${port}`));

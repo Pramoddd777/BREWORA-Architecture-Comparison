@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 5s
+scrape_configs:
+  - job_name: monolith
+    static_configs:
+      - targets: ["host.docker.internal:5100"]
+        labels: { architecture: "modular_monolith", component: "monolith" }
+  - job_name: gateway
+    static_configs:
+      - targets: ["host.docker.internal:5000"]
+        labels: { architecture: "microservices", component: "gateway" }
+  - job_name: microservices
+    static_configs:
+      - targets:
+          - "host.docker.internal:5001"
+          - "host.docker.internal:5002"
+          - "host.docker.internal:5003"
+          - "host.docker.internal:5004"
+          - "host.docker.internal:5005"
+          - "host.docker.internal:5006"
+          - "host.docker.internal:5007"
+          - "host.docker.internal:5008"
+          - "host.docker.internal:5009"
+          - "host.docker.internal:5010"
+          - "host.docker.internal:5011"
+          - "host.docker.internal:5012"
+        labels: { architecture: "microservices" }

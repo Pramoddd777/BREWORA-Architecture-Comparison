@@ -1,0 +1,5 @@
+{
+  "name":"brewora-comparison","version":"1.0.0","private":true,
+  "scripts":{"monolith":"node modular-monolith/server.js","microservices":"node microservices/launcher.js","benchmark":"node scripts/benchmark.js"},
+  "dependencies":{"express":"^4.21.2","prom-client":"^15.1.3"}
+}

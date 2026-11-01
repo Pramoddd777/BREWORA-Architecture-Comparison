@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-10-17T12:54:58.283Z",
+  "results": [
+    {
+      "architecture": "modular_monolith",
+      "iterations": 1000,
+      "elapsed_seconds": 12.139,
+      "requests_per_second": 82.38,
+      "errors": 0,
+      "error_rate_percent": 0,
+      "latency_ms": {
+        "p50": 15.09,
+        "p95": 16.4,
+        "p99": 17.36
+      },
+      "note": "Sequential smoke test; repeat before drawing conclusions."
+    },
+    {
+      "architecture": "microservices",
+      "iterations": 1000,
+      "elapsed_seconds": 25.915,
+      "requests_per_second": 38.59,
+      "errors": 0,
+      "error_rate_percent": 0,
+      "latency_ms": {
+        "p50": 30.49,
+        "p95": 33.01,
+        "p99": 34.96
+      },
+      "note": "Sequential smoke test; repeat before drawing conclusions."
+    }
+  ]
+}
