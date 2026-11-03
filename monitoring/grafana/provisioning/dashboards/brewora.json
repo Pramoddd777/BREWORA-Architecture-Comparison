@@ -2,11 +2,13 @@
   "uid": "brewora-comparison",
   "title": "BREWORA Architecture Comparison",
   "tags": [
-    "brewora"
+    "brewora",
+    "architecture",
+    "monitoring"
   ],
   "timezone": "browser",
   "schemaVersion": 41,
-  "version": 1,
+  "version": 2,
   "refresh": "5s",
   "time": {
     "from": "now-15m",
@@ -15,11 +17,12 @@
   "panels": [
     {
       "id": 1,
-      "type": "timeseries",
-      "title": "Request rate (req/sec)",
+      "type": "stat",
+      "title": "Monolith target",
+      "description": "1 means Prometheus can scrape the Modular Monolith metrics endpoint.",
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 4,
+        "w": 6,
         "x": 0,
         "y": 0
       },
@@ -29,9 +32,333 @@
       },
       "targets": [
         {
-          "expr": "sum by (architecture) (rate(brewora_http_requests_total[1m]))",
-          "legendFormat": "{{architecture}}",
+          "expr": "min(up{job=\"monolith\"})",
           "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bool"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Microservices gateway target",
+      "description": "1 means Prometheus can scrape the API Gateway metrics endpoint.",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "min(up{job=\"gateway\"})",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bool"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Healthy microservice targets",
+      "description": "Count of microservice scrape targets currently UP.",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(up{job=\"microservices\"})",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Configured microservice targets",
+      "description": "Number of microservice targets configured in Prometheus.",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "count(up{job=\"microservices\"})",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "CPU usage (cores \u00d7 100)",
+      "description": "Process CPU time rate multiplied by 100. This is percent of one CPU core per architecture, summed across scraped processes.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (architecture) (rate(brewora_process_cpu_seconds_total[1m])) * 100",
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Resident memory (MiB)",
+      "description": "Sum of resident memory across all scraped processes in each architecture.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (architecture) (brewora_process_resident_memory_bytes) / 1024 / 1024",
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Node.js heap used (MiB)",
+      "description": "Sum of Node.js heap used across scraped processes.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (architecture) (brewora_nodejs_heap_size_used_bytes) / 1024 / 1024",
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Event-loop lag (ms)",
+      "description": "Average event-loop lag across scraped processes. Confirm the metric represents a gauge in your instrumentation.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "avg by (architecture) (brewora_nodejs_eventloop_lag_seconds) * 1000",
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "HTTP request rate (req/s)",
+      "description": "Aggregated request counter rate across all scraped endpoints.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (architecture) (rate(brewora_http_requests_total[1m]))",
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
         }
       ],
       "fieldConfig": {
@@ -46,19 +373,21 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "multi",
+          "sort": "desc"
         }
       }
     },
     {
-      "id": 2,
+      "id": 10,
       "type": "timeseries",
-      "title": "P95 HTTP latency",
+      "title": "P95 HTTP latency (seconds)",
+      "description": "P95 from aggregated Prometheus histogram buckets. Requires enough observations in the selected window.",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 21
       },
       "datasource": {
         "type": "prometheus",
@@ -67,8 +396,8 @@
       "targets": [
         {
           "expr": "histogram_quantile(0.95, sum by (le, architecture) (rate(brewora_http_request_duration_seconds_bucket[5m])))",
-          "legendFormat": "{{architecture}}",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
         }
       ],
       "fieldConfig": {
@@ -83,19 +412,99 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "multi",
+          "sort": "desc"
         }
       }
     },
     {
-      "id": 3,
+      "id": 11,
       "type": "timeseries",
-      "title": "5xx error requests/sec",
+      "title": "P50 HTTP latency (seconds)",
+      "description": "P50 from aggregated Prometheus histogram buckets.",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 29
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by (le, architecture) (rate(brewora_http_request_duration_seconds_bucket[5m])))",
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "P90 HTTP latency (seconds)",
+      "description": "P90 from aggregated Prometheus histogram buckets.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 29
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.90, sum by (le, architecture) (rate(brewora_http_request_duration_seconds_bucket[5m])))",
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "HTTP 5xx errors (req/s)",
+      "description": "Rate of HTTP 5xx responses. May be empty when no 5xx responses occur.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 37
       },
       "datasource": {
         "type": "prometheus",
@@ -104,8 +513,8 @@
       "targets": [
         {
           "expr": "sum by (architecture) (rate(brewora_http_requests_total{status=~\"5..\"}[5m]))",
-          "legendFormat": "{{architecture}}",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
         }
       ],
       "fieldConfig": {
@@ -120,19 +529,21 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "multi",
+          "sort": "desc"
         }
       }
     },
     {
-      "id": 4,
+      "id": 14,
       "type": "timeseries",
-      "title": "Process memory (bytes)",
+      "title": "HTTP 2xx success rate (req/s)",
+      "description": "Rate of HTTP 2xx responses. Depends on the instrumentation status label.",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 37
       },
       "datasource": {
         "type": "prometheus",
@@ -140,14 +551,14 @@
       },
       "targets": [
         {
-          "expr": "sum by (architecture) (brewora_process_resident_memory_bytes)",
-          "legendFormat": "{{architecture}}",
-          "refId": "A"
+          "expr": "sum by (architecture) (rate(brewora_http_requests_total{status=~\"2..\"}[5m]))",
+          "refId": "A",
+          "legendFormat": "{{architecture}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "bytes"
+          "unit": "reqps"
         },
         "overrides": []
       },
@@ -157,19 +568,21 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "multi",
+          "sort": "desc"
         }
       }
     },
     {
-      "id": 5,
-      "type": "timeseries",
-      "title": "Scrape target health",
+      "id": 15,
+      "type": "table",
+      "title": "Microservices scrape target health",
+      "description": "One row per microservice target. 1 = UP; 0 = DOWN.",
       "gridPos": {
-        "h": 6,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 45
       },
       "datasource": {
         "type": "prometheus",
@@ -177,25 +590,22 @@
       },
       "targets": [
         {
-          "expr": "up",
-          "legendFormat": "{{job}} {{instance}}",
-          "refId": "A"
+          "expr": "up{job=\"microservices\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "min": 0,
-          "max": 1
+          "unit": "bool"
         },
         "overrides": []
       },
       "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         }
       }
     }

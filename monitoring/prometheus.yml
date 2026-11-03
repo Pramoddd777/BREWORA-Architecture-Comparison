@@ -1,27 +1,50 @@
+
 global:
   scrape_interval: 5s
+  evaluation_interval: 5s
+
 scrape_configs:
+
+  # ==========================================
+  # 1. MODULAR MONOLITH
+  # ==========================================
   - job_name: monolith
     static_configs:
-      - targets: ["host.docker.internal:5100"]
-        labels: { architecture: "modular_monolith", component: "monolith" }
+      - targets:
+          - "host.docker.internal:5100"
+        labels:
+          architecture: "modular_monolith"
+          component: "monolith"
+
+  # ==========================================
+  # 2. MICROSERVICES API GATEWAY
+  # ==========================================
   - job_name: gateway
     static_configs:
-      - targets: ["host.docker.internal:5000"]
-        labels: { architecture: "microservices", component: "gateway" }
+      - targets:
+          - "host.docker.internal:5000"
+        labels:
+          architecture: "microservices"
+          component: "gateway"
+
+  # ==========================================
+  # 3. MICROSERVICES
+  # ==========================================
   - job_name: microservices
     static_configs:
       - targets:
-          - "host.docker.internal:5001"
-          - "host.docker.internal:5002"
-          - "host.docker.internal:5003"
-          - "host.docker.internal:5004"
-          - "host.docker.internal:5005"
-          - "host.docker.internal:5006"
-          - "host.docker.internal:5007"
-          - "host.docker.internal:5008"
-          - "host.docker.internal:5009"
-          - "host.docker.internal:5010"
-          - "host.docker.internal:5011"
-          - "host.docker.internal:5012"
-        labels: { architecture: "microservices" }
+          - "host.docker.internal:5001"  # User
+          - "host.docker.internal:5002"  # Product
+          - "host.docker.internal:5003"  # Catalog
+          - "host.docker.internal:5004"  # Inventory
+          - "host.docker.internal:5005"  # Cart
+          - "host.docker.internal:5006"  # Order
+          - "host.docker.internal:5007"  # Payment
+          - "host.docker.internal:5008"  # Refund
+          - "host.docker.internal:5009"  # Kitchen
+          - "host.docker.internal:5010"  # Notification
+          - "host.docker.internal:5011"  # POS
+          - "host.docker.internal:5012"  # Settings
+          - "host.docker.internal:5013"  # Catalog2
+        labels:
+          architecture: "microservices"
